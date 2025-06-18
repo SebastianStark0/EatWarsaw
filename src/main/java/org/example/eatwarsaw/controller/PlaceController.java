@@ -3,9 +3,13 @@ package org.example.eatwarsaw.controller;
 import jakarta.validation.Valid;
 import org.example.eatwarsaw.dto.CategoryDto;
 import org.example.eatwarsaw.dto.PlaceDto;
+import org.example.eatwarsaw.dto.create.PlaceCreateDto;
 import org.example.eatwarsaw.model.Place;
 import org.example.eatwarsaw.service.PlaceService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -30,9 +34,13 @@ public class PlaceController {
         return placeService.getById(id);
     }
 
-    @PostMapping
-    public PlaceDto create(@Valid @RequestBody PlaceDto dto) {
-        return placeService.createPlace(dto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PlaceDto> createPlace(
+            @RequestPart("place") @Valid PlaceCreateDto placeDto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+
+        PlaceDto created = placeService.createPlace(placeDto, imageFile);
+        return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}")

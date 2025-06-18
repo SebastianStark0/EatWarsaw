@@ -1,6 +1,8 @@
 package org.example.eatwarsaw.controller;
 
+import jakarta.validation.Valid;
 import org.example.eatwarsaw.dto.CategoryDto;
+import org.example.eatwarsaw.dto.create.CategoryCreateDto;
 import org.example.eatwarsaw.mapper.CategoryMapper;
 import org.example.eatwarsaw.model.Category;
 import org.example.eatwarsaw.repository.CategoryRepository;
@@ -29,11 +31,9 @@ public class CategoryController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CategoryDto> createCategory(
-            @RequestParam("name") String name,
-            @RequestParam("author") String author,
-            @RequestParam("description") String description,
-            @RequestParam("image") MultipartFile image) {
+            @RequestPart("category") @Valid CategoryCreateDto categoryDto,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
 
-        return ResponseEntity.ok(categoryService.createCategory(name, author, description, image));
+        return ResponseEntity.ok(categoryService.createCategory(categoryDto, image));
     }
 }

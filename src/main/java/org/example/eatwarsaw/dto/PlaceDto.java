@@ -22,6 +22,8 @@ public class PlaceDto {
     private Integer appRatingsCount;
     private Double appRating;
 
+    private String description;
+
     @NotBlank
     private String imageUrl;
 

@@ -1,6 +1,7 @@
 package org.example.eatwarsaw.mapper;
 
 import org.example.eatwarsaw.dto.PlaceDto;
+import org.example.eatwarsaw.dto.create.PlaceCreateDto;
 import org.example.eatwarsaw.model.Category;
 import org.example.eatwarsaw.model.Place;
 import org.springframework.stereotype.Component;
@@ -68,5 +69,19 @@ public class PlaceMapper {
         if (dto.getAppRating() != null) place.setAppRating(dto.getAppRating());
         if (dto.getImageUrl() != null) place.setImageUrl(dto.getImageUrl());
         if (categories != null) place.setCategories(categories);
+    }
+
+    public static Place toEntity(PlaceCreateDto dto, Set<Category> categories) {
+        Place place = new Place();
+        place.setName(dto.getName());
+        place.setAddress(dto.getAddress());
+        place.setDescription(dto.getDescription());
+        place.setImageUrl(dto.getImageUrl());
+        place.setCategories(categories);
+        place.setGoogleRatingsCount(0);
+        place.setGoogleRating(0.0);
+        place.setAppRatingsCount(0);
+        place.setAppRating(0.0);
+        return place;
     }
 }

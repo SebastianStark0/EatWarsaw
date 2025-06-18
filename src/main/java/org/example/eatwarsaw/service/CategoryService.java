@@ -1,18 +1,15 @@
 package org.example.eatwarsaw.service;
 
 import org.example.eatwarsaw.dto.CategoryDto;
+import org.example.eatwarsaw.dto.create.CategoryCreateDto;
+import org.example.eatwarsaw.exception.ResourceNotFoundException;
 import org.example.eatwarsaw.mapper.CategoryMapper;
 import org.example.eatwarsaw.model.Category;
 import org.example.eatwarsaw.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class CategoryService {
@@ -32,14 +29,35 @@ public class CategoryService {
         return mapper.toDtoList(categories);
     }
 
-    public CategoryDto createCategory(String name, String author, String description, MultipartFile image) {
-        String imageUrl = imageStorageService.saveImage(image, "categories");
+    public CategoryDto createCategory(CategoryCreateDto dto, MultipartFile image) {
+        String imageUrl = (image == null || image.isEmpty())
+                ? "0.jpg"
+                : imageStorageService.saveImage(image, "categories");
+
         Category category = new Category();
-        category.setName(name);
-        category.setAuthor(author);
-        category.setImageUrl(imageUrl);
-        category.setDescription(description);
+        fillCategoryFromDto(category, dto, imageUrl);
         repository.save(category);
         return mapper.toDto(category);
     }
+    public CategoryDto updateCategory(Long id, CategoryCreateDto dto, MultipartFile image) {
+        Category category = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        String imageUrl = (image == null || image.isEmpty())
+                ? category.getImageUrl()  // зберігаємо старе, якщо нового нема
+                : imageStorageService.saveImage(image, "categories");
+
+        fillCategoryFromDto(category, dto, imageUrl);
+        repository.save(category);
+        return mapper.toDto(category);
+    }
+
+
+    private void fillCategoryFromDto(Category category, CategoryCreateDto dto, String imageUrl) {
+        category.setName(dto.getName());
+        category.setAuthor(dto.getAuthor());
+        category.setDescription(dto.getDescription());
+        category.setImageUrl(imageUrl);
+    }
+
 }

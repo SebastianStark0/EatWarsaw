@@ -20,8 +20,8 @@ public class CommentServiceTest {
     @Autowired
     private PlaceRepository placeRepository;
 
-    @Test
-    public void testAddAndGetComments() {
+//    @Test
+//    public void testAddAndGetComments() {
 //        Place place = placeRepository.save(new Place());
 //
 //        CommentDto dto = new CommentDto();
@@ -35,5 +35,5 @@ public class CommentServiceTest {
 //        List<Comment> comments = commentService.getCommentsByPlaceId(place.getId());
 //        assertFalse(comments.isEmpty());
 //        assertEquals("TestUser", comments.get(0).getAuthor());
-    }
+//    }
 }

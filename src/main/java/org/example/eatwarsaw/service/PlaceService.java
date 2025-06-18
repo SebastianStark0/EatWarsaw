@@ -2,6 +2,7 @@ package org.example.eatwarsaw.service;
 
 import org.example.eatwarsaw.dto.CategoryDto;
 import org.example.eatwarsaw.dto.PlaceDto;
+import org.example.eatwarsaw.dto.create.PlaceCreateDto;
 import org.example.eatwarsaw.exception.PlaceNotFoundException;
 import org.example.eatwarsaw.mapper.CategoryMapper;
 import org.example.eatwarsaw.mapper.PlaceMapper;
@@ -10,11 +11,9 @@ import org.example.eatwarsaw.model.Place;
 import org.example.eatwarsaw.repository.CategoryRepository;
 import org.example.eatwarsaw.repository.PlaceRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,27 +22,36 @@ public class PlaceService {
     private final CategoryRepository categoryRepository;
     private final PlaceMapper placeMapper;
     private final CategoryMapper categoryMapper;
+    private final ImageStorageService imageStorageService;
 
-    public PlaceService(PlaceRepository placeRepository, CategoryRepository categoryRepository, PlaceMapper placeMapper, CategoryMapper categoryMapper) {
+    public PlaceService(PlaceRepository placeRepository, CategoryRepository categoryRepository, PlaceMapper placeMapper, CategoryMapper categoryMapper, ImageStorageService imageStorageService) {
         this.placeMapper = placeMapper;
         this.categoryMapper = categoryMapper;
         this.placeRepository = placeRepository;
         this.categoryRepository = categoryRepository;
+        this.imageStorageService = imageStorageService;
     }
 
-    public PlaceDto createPlace(PlaceDto dto) {
+    public PlaceDto createPlace(PlaceCreateDto dto, MultipartFile imageFile) {
+        Set<Category> categories = new HashSet<>(categoryRepository.findAllById(dto.getCategoryIds()));
 
-        Set<Category> categories = Optional.ofNullable(dto.getCategoryIds())
-                .orElse(Collections.emptySet())
-                .stream()
-                .map(id -> categoryRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Category not found: " + id)))
-                .collect(Collectors.toSet());
+        String imageUrl = imageFile != null ? imageStorageService.saveImage(imageFile, "places") : "";
 
-        Place place = placeMapper.toEntity(dto, categories);
-        Place saved = placeRepository.save(place);
-        return placeMapper.toDto(saved);
+        Place place = new Place();
+        place.setName(dto.getName());
+        place.setAddress(dto.getAddress());
+        place.setDescription(dto.getDescription());
+        place.setImageUrl(imageUrl);
+        place.setCategories(categories);
+        place.setGoogleRatingsCount(0);
+        place.setGoogleRating(0.0);
+        place.setAppRatingsCount(0);
+        place.setAppRating(0.0);
+
+        place = placeRepository.save(place);
+        return placeMapper.toDto(place);
     }
+
 
     public PlaceDto updatePlace(Long id, PlaceDto dto) {
         Place place = placeRepository.findById(id)
