@@ -1,10 +1,8 @@
 package org.example.eatwarsaw.controller;
 
 import jakarta.validation.Valid;
-import org.example.eatwarsaw.dto.CategoryDto;
 import org.example.eatwarsaw.dto.PlaceDto;
 import org.example.eatwarsaw.dto.create.PlaceCreateDto;
-import org.example.eatwarsaw.model.Place;
 import org.example.eatwarsaw.service.PlaceService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Set;
 
 
 @RestController

@@ -1,13 +1,16 @@
 package org.example.eatwarsaw.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.eatwarsaw.config.services.UserDetailsImpl;
 import org.example.eatwarsaw.dto.UserDto;
 import org.example.eatwarsaw.dto.create.UserProfileDto;
-import org.example.eatwarsaw.dto.request.LoginRequest;
-import org.example.eatwarsaw.dto.request.RegisterRequest;
 import org.example.eatwarsaw.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -15,17 +18,13 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody RegisterRequest request) {
-        UserDto createdUser = userService.registerUser(request);
-        return ResponseEntity.ok(createdUser);
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Optional<UserDto> user = userService.findByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(user.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userDetails.getUsername())));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        String token = userService.loginAndGetToken(loginRequest);
-        return ResponseEntity.ok(token);
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {

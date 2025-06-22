@@ -1,6 +1,7 @@
 package org.example.eatwarsaw.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.eatwarsaw.config.services.UserDetailsImpl;
 import org.example.eatwarsaw.repository.UserRepository;
 import org.example.eatwarsaw.service.UserService;
 import org.springframework.context.annotation.Bean;
@@ -34,8 +35,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/api/places/**").permitAll()
-                        .requestMatchers("/api/public/**", "/oauth2/**").permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers("/api/login/register", "/api/login/default_login",
+                                        "/api/users/me", "/api/login/forgot_password", "/api/login/reset_password",
+                                        "/api/public/**", "/oauth2/**")
+                                .permitAll()
+                                .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -51,11 +55,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> userRepository.findByEmail(email)
-                .map(user -> new org.springframework.security.core.userdetails.User(
-                        user.getEmail(),
-                        user.getPassword(),
-                        Collections.emptyList()
-                ))
+                .map(UserDetailsImpl::build)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 

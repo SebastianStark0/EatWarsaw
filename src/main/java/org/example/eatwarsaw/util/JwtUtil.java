@@ -29,6 +29,7 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
+        System.out.println("Token: " + token);
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
