@@ -25,7 +25,6 @@ public class UserController {
         return ResponseEntity.ok(user.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userDetails.getUsername())));
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
