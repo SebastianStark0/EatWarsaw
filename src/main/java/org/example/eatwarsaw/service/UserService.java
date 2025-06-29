@@ -1,53 +1,46 @@
 package org.example.eatwarsaw.service;
 
 import org.example.eatwarsaw.dto.UserDto;
+import org.example.eatwarsaw.dto.UserShortDto;
 import org.example.eatwarsaw.dto.create.UserProfileDto;
-import org.example.eatwarsaw.dto.request.LoginRequest;
-import org.example.eatwarsaw.dto.request.RegisterRequest;
 import org.example.eatwarsaw.mapper.UserMapper;
-import org.example.eatwarsaw.model.User;
+import org.example.eatwarsaw.model.user.CustomUserDetails;
+import org.example.eatwarsaw.model.user.User;
 import org.example.eatwarsaw.repository.UserRepository;
-import org.example.eatwarsaw.util.JwtUtil;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class UserService {
 
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final EmailService emailService;
     private final UserMapper userMapper;
-    private final JwtUtil jwtUtil;
 
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder,
-                       EmailService emailService,
-                       UserMapper userMapper,
-                       JwtUtil jwtUtil) {
-        this.passwordEncoder = passwordEncoder;
+                       UserMapper userMapper) {
         this.userRepository = userRepository;
-        this.emailService = emailService;
         this.userMapper = userMapper;
-        this.jwtUtil = jwtUtil;
     }
 
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
 
-    public Optional<UserDto> findByEmail(String email) {
+    public User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .map(userMapper::toDto);
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public UserDto findByEmail(String email) {
+        return userMapper.toDto(findUserByEmail(email));
     }
 
     public UserDto getUserById(Long id) {
-        return userRepository.findById(id)
-                .map(userMapper::toDto)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userMapper.toDto(findUserById(id));
     }
 
     public UserProfileDto getProfile(Long userId) {
@@ -55,6 +48,7 @@ public class UserService {
         return UserMapper.toProfileDto(user);
 
     }
+
     public UserProfileDto updateMyProfile(UserProfileDto dto) {
         User user = getCurrentUser();
         UserMapper.updateUserFromDto(user, dto);
@@ -62,21 +56,18 @@ public class UserService {
         return UserMapper.toProfileDto(user);
     }
 
-    public User getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails userDetails) {
-            return userRepository.findByEmail(userDetails.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        }
-        throw new UsernameNotFoundException("User not authenticated");
+    public List<UserShortDto> searchUsers(String query) {
+        List<User> users = userRepository.searchUsers(query);
+        return users.stream().map(userMapper::toShortDto).toList();
     }
 
 
-
-
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomUserDetails userDetails) {
+            return findUserById(userDetails.getId());
+        }
+        throw new UsernameNotFoundException("User not authenticated");
     }
 
 }

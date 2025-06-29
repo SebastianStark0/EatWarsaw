@@ -2,7 +2,7 @@ package org.example.eatwarsaw.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.eatwarsaw.config.services.DevAuthenticationFilter;
-import org.example.eatwarsaw.config.services.UserDetailsImpl;
+import org.example.eatwarsaw.model.user.CustomUserDetails;
 import org.example.eatwarsaw.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,7 +56,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> userRepository.findByEmail(email)
-                .map(UserDetailsImpl::build)
+                .map(CustomUserDetails::build)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 

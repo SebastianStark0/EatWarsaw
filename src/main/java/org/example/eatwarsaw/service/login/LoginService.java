@@ -1,10 +1,10 @@
 package org.example.eatwarsaw.service.login;
 
 import org.example.eatwarsaw.dto.UserDto;
-import org.example.eatwarsaw.dto.request.LoginRequest;
-import org.example.eatwarsaw.dto.request.RegisterRequest;
+import org.example.eatwarsaw.dto.login.LoginRequest;
+import org.example.eatwarsaw.dto.login.RegisterRequest;
 import org.example.eatwarsaw.mapper.UserMapper;
-import org.example.eatwarsaw.model.User;
+import org.example.eatwarsaw.model.user.User;
 import org.example.eatwarsaw.repository.UserRepository;
 import org.example.eatwarsaw.service.EmailService;
 import org.example.eatwarsaw.service.UserService;
@@ -13,8 +13,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class LoginService {
@@ -75,12 +73,7 @@ public class LoginService {
 
 
     public boolean sendPasswordResetEmail(String email) {
-        Optional<UserDto> userDtoOpt = userService.findByEmail(email);
-        if (userDtoOpt.isEmpty()) {
-            return false;
-        }
-        UserDto userDto = userDtoOpt.get();
-
+        UserDto userDto = userService.findByEmail(email);
         String token = jwtUtil.generateToken(userDto.getName());  // або getEmail() залежно від логіки
         String resetLink = "https://yourfrontend/reset-password?token=" + token;
 

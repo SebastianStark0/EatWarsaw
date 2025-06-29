@@ -8,8 +8,10 @@ import org.example.eatwarsaw.mapper.CategoryMapper;
 import org.example.eatwarsaw.mapper.PlaceMapper;
 import org.example.eatwarsaw.model.Category;
 import org.example.eatwarsaw.model.Place;
+import org.example.eatwarsaw.model.user.User;
 import org.example.eatwarsaw.repository.CategoryRepository;
 import org.example.eatwarsaw.repository.PlaceRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,12 +23,10 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final CategoryRepository categoryRepository;
     private final PlaceMapper placeMapper;
-    private final CategoryMapper categoryMapper;
     private final ImageStorageService imageStorageService;
 
-    public PlaceService(PlaceRepository placeRepository, CategoryRepository categoryRepository, PlaceMapper placeMapper, CategoryMapper categoryMapper, ImageStorageService imageStorageService) {
+    public PlaceService(PlaceRepository placeRepository, CategoryRepository categoryRepository, PlaceMapper placeMapper, ImageStorageService imageStorageService) {
         this.placeMapper = placeMapper;
-        this.categoryMapper = categoryMapper;
         this.placeRepository = placeRepository;
         this.categoryRepository = categoryRepository;
         this.imageStorageService = imageStorageService;
@@ -34,20 +34,18 @@ public class PlaceService {
 
     public PlaceDto createPlace(PlaceCreateDto dto, MultipartFile imageFile) {
         Set<Category> categories = new HashSet<>(categoryRepository.findAllById(dto.getCategoryIds()));
-
         String imageUrl = imageFile != null ? imageStorageService.saveImage(imageFile, "places") : "";
-
-        Place place = new Place();
-        place.setName(dto.getName());
-        place.setAddress(dto.getAddress());
-        place.setDescription(dto.getDescription());
-        place.setImageUrl(imageUrl);
-        place.setCategories(categories);
-        place.setGoogleRatingsCount(0);
-        place.setGoogleRating(0.0);
-        place.setAppRatingsCount(0);
-        place.setAppRating(0.0);
-
+        Place place = Place.builder()
+                .name(dto.getName())
+                .address(dto.getAddress())
+                .description(dto.getDescription())
+                .imageUrl(imageUrl)
+                .categories(categories)
+                .googleRatingsCount(0)
+                .googleRating(0.0)
+                .appRatingsCount(0)
+                .appRating(0.0)
+                .build();
         place = placeRepository.save(place);
         return placeMapper.toDto(place);
     }
@@ -72,8 +70,7 @@ public class PlaceService {
     }
 
     public PlaceDto getById(Long id) {
-        Place place = placeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Place not found"));
+        Place place = findById(id);
         return placeMapper.toDto(place);
     }
 
@@ -82,5 +79,10 @@ public class PlaceService {
             throw new PlaceNotFoundException(id);
         }
         placeRepository.deleteById(id);
+    }
+
+    public Place findById(Long id) {
+        return placeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Place not found"));
     }
 }

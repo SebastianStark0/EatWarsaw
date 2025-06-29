@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Data
 public class UserProfileDto {
     private String name;
+    private String email;
     private String avatarUrl;
     private String bio;
     private LocalDate birthDate;

@@ -17,9 +17,11 @@ public class CategoryService {
     private final CategoryRepository repository;
     private final CategoryMapper mapper;
     private final ImageStorageService imageStorageService;
+    private final UserService userService;
 
-    public CategoryService(CategoryRepository repository, CategoryMapper mapper, ImageStorageService imageStorageService) {
+    public CategoryService(CategoryRepository repository, CategoryMapper mapper, UserService userService, ImageStorageService imageStorageService) {
         this.imageStorageService = imageStorageService;
+        this.userService = userService;
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -36,28 +38,30 @@ public class CategoryService {
 
         Category category = new Category();
         fillCategoryFromDto(category, dto, imageUrl);
+        category.setAuthor(userService.getCurrentUser());
+
         repository.save(category);
         return mapper.toDto(category);
     }
+
     public CategoryDto updateCategory(Long id, CategoryCreateDto dto, MultipartFile image) {
-        Category category = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-
+        Category category = findById(id);
         String imageUrl = (image == null || image.isEmpty())
-                ? category.getImageUrl()  // зберігаємо старе, якщо нового нема
+                ? category.getImageUrl()
                 : imageStorageService.saveImage(image, "categories");
-
         fillCategoryFromDto(category, dto, imageUrl);
         repository.save(category);
         return mapper.toDto(category);
     }
 
-
     private void fillCategoryFromDto(Category category, CategoryCreateDto dto, String imageUrl) {
         category.setName(dto.getName());
-        category.setAuthor(dto.getAuthor());
         category.setDescription(dto.getDescription());
         category.setImageUrl(imageUrl);
     }
 
+    public Category findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+    }
 }

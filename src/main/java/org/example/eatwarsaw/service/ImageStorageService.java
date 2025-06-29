@@ -24,10 +24,8 @@ public class ImageStorageService {
             String extension = getExtension(Objects.requireNonNull(file.getOriginalFilename()));
             String filename = UUID.randomUUID() + "." + extension;
             Path targetPath = uploadDir.resolve(subfolder).resolve(filename);
-
             Files.createDirectories(targetPath.getParent());
             file.transferTo(targetPath);
-
             return "/uploads/" + subfolder + "/" + filename;
         } catch (IOException e) {
             throw new RuntimeException("Не вдалося зберегти файл", e);

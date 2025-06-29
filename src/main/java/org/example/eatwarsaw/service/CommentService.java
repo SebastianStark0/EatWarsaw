@@ -16,12 +16,12 @@ import java.util.stream.Collectors;
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final PlaceRepository placeRepository;
+    private final PlaceService placeService;
     private final CommentMapper commentMapper;
 
-    public CommentService(CommentRepository commentRepository, PlaceRepository placeRepository, CommentMapper commentMapper) {
+    public CommentService(CommentRepository commentRepository, PlaceService placeService, CommentMapper commentMapper) {
         this.commentRepository = commentRepository;
-        this.placeRepository = placeRepository;
+        this.placeService = placeService;
         this.commentMapper = commentMapper;
     }
 
@@ -29,16 +29,18 @@ public class CommentService {
         List<Comment> comments = commentRepository.findByPlaceId(placeId);
         return comments.stream()
                 .map(commentMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public CommentDto addComment(Long placeId, CommentDto dto) {
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new PlaceNotFoundException(placeId));
-
-        Comment comment = commentMapper.toEntity(dto);
-        comment.setPlace(place);
-        comment.setCreatedAt(LocalDateTime.now());
+        Place place = placeService.findById(placeId);
+        Comment base = commentMapper.toEntity(dto);
+        Comment comment = Comment.builder()
+                .text(base.getText())
+                .author(base.getAuthor())
+                .place(place)
+                .createdAt(LocalDateTime.now())
+                .build();
         Comment savedComment = commentRepository.save(comment);
         return commentMapper.toDto(savedComment);
     }

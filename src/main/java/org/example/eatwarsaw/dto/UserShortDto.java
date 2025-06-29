@@ -1,22 +1,15 @@
 package org.example.eatwarsaw.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDto {
+public class UserShortDto {
     private Long id;
     private String name;
-    private String description;
-    private String imageUrl;
-    private Long authorId;
-    private String authorName;
-    private List<Long> placeIds;
-
+    private String username;
+    private String avatarUrl;
 }

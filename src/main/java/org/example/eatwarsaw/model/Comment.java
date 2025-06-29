@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.example.eatwarsaw.model.user.User;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Data
+@Entity
+@Builder
 @Table(name = "comment")
 public class Comment {
     @Id
@@ -19,7 +21,9 @@ public class Comment {
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
 
-    private String author;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
 
     @Column(columnDefinition = "TEXT")
     private String text;

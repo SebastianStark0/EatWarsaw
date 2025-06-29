@@ -2,14 +2,16 @@ package org.example.eatwarsaw.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.eatwarsaw.model.user.User;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
 @Data
+@Entity
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Place {
@@ -34,6 +36,10 @@ public class Place {
     private String imageUrl;
 
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();

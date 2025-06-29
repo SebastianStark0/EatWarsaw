@@ -1,18 +1,10 @@
 package org.example.eatwarsaw.mapper;
 
-import org.example.eatwarsaw.dto.PlaceDto;
 import org.example.eatwarsaw.dto.UserDto;
-import org.example.eatwarsaw.dto.create.PlaceCreateDto;
+import org.example.eatwarsaw.dto.UserShortDto;
 import org.example.eatwarsaw.dto.create.UserProfileDto;
-import org.example.eatwarsaw.model.Category;
-import org.example.eatwarsaw.model.Place;
-import org.example.eatwarsaw.model.User;
+import org.example.eatwarsaw.model.user.User;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
@@ -26,10 +18,16 @@ public class UserMapper {
         return dto;
     }
 
-    public static UserProfileDto toProfileDto(User user) {
+
+    public UserShortDto toShortDto(User user) {
         if (user == null) return null;
+        return new UserShortDto(user.getId(), user.getName(), user.getUsername(), user.getAvatarUrl());
+    }
+
+    public static UserProfileDto toProfileDto(User user) {
         UserProfileDto dto = new UserProfileDto();
         dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
         dto.setAvatarUrl(user.getAvatarUrl());
         dto.setBio(user.getBio());
         dto.setBirthDate(user.getBirthDate());
@@ -38,11 +36,12 @@ public class UserMapper {
     }
 
     public static void updateUserFromDto(User user, UserProfileDto dto) {
-        if (dto.getName() != null) user.setName(dto.getName());
-        if (dto.getAvatarUrl() != null) user.setAvatarUrl(dto.getAvatarUrl());
-        if (dto.getBio() != null) user.setBio(dto.getBio());
-        if (dto.getBirthDate() != null) user.setBirthDate(dto.getBirthDate());
-        if (dto.getGender() != null) user.setGender(dto.getGender());
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setBio(dto.getBio());
+        user.setBirthDate(dto.getBirthDate());
+        user.setGender(dto.getGender());
     }
 
 }

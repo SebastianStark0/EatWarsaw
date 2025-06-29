@@ -1,4 +1,4 @@
-package org.example.eatwarsaw.dto.request;
+package org.example.eatwarsaw.dto.login;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

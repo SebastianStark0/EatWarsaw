@@ -1,4 +1,4 @@
-package org.example.eatwarsaw.dto.response;
+package org.example.eatwarsaw.dto.login;
 
 
 import lombok.AllArgsConstructor;

@@ -1,9 +1,8 @@
 package org.example.eatwarsaw.config.services;
 
-import org.example.eatwarsaw.model.User;
-import org.example.eatwarsaw.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.example.eatwarsaw.model.user.CustomUserDetails;
+import org.example.eatwarsaw.model.user.User;
+import org.example.eatwarsaw.service.UserService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -11,13 +10,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
+
+    public UserDetailsServiceImpl(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPassword());
+    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userService.findUserByEmail(email);
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword());
     }
+
+
 }

@@ -2,7 +2,7 @@ package org.example.eatwarsaw.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.example.eatwarsaw.model.Place;
+import org.example.eatwarsaw.model.user.User;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -21,7 +21,9 @@ public class Category {
 
     private String imageUrl;
 
-    private String author;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
 
     private LocalDateTime createdAt;
 

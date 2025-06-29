@@ -1,28 +1,26 @@
-package org.example.eatwarsaw.config.services;
+package org.example.eatwarsaw.model.user;
 
 
 import lombok.Getter;
-import org.example.eatwarsaw.model.User;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserDetailsImpl implements UserDetails {
+public class CustomUserDetails implements org.springframework.security.core.userdetails.UserDetails {
     @Getter
     private final Long id;
     private final String email;
     private final String password;
 
-    public UserDetailsImpl(Long id, String email, String password) {
+    public CustomUserDetails(Long id, String email, String password) {
         this.id = id;
         this.email = email;
         this.password = password;
     }
 
-    public static UserDetailsImpl build(User user) {
-        return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPassword());
+    public static CustomUserDetails build(User user) {
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword());
     }
 
     @Override

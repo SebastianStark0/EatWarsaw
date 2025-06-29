@@ -3,7 +3,7 @@ package org.example.eatwarsaw.service.login;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import org.example.eatwarsaw.dto.DecodedTokenInfo;
+import org.example.eatwarsaw.dto.login.DecodedTokenInfo;
 import org.example.eatwarsaw.exception.UnauthorizedException;
 import org.springframework.stereotype.Service;
 
